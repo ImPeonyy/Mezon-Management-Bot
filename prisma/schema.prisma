@@ -6,10 +6,50 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../src/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+enum EEvent {
+  CLAN_JOIN
+  CLAN_LEAVE
+}
+
+model User {
+  id        String   @id
+  username  String
+  password  String
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  clans     Clan[]
+}
+
+model Clan {
+  id                  String   @id
+  clan_name           String
+  owner_id            String
+  welcome_channel_id  String
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  owner User @relation(fields: [owner_id], references: [id])
+  event_messages     EventMessage[]
+}
+
+model EventMessage {
+  id        Int      @id @default(autoincrement())
+  clan_id   String
+  event     EEvent 
+  template  String  
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  clan Clan @relation(fields: [clan_id], references: [id])
 }

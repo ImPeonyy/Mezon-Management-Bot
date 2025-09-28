@@ -2,7 +2,8 @@ import dotenv from 'dotenv';
 import { MezonClient } from 'mezon-sdk';
 import express from 'express';
 import cors from 'cors';
-import { onEventListeners } from '@bot/index';
+import { onEventListeners } from '@/bot'; 
+import routes from '@/routes';
 
 
 dotenv.config();
@@ -10,6 +11,11 @@ dotenv.config();
 const app = express();
 
 app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// API routes
+app.use('/api', routes);
 
 process.on('unhandledRejection', (reason, promise) => {
     console.error('Unhandled Rejection at:', promise, 'reason:', reason);
@@ -26,8 +32,6 @@ async function main() {
 
     // on event listeners
     onEventListeners(client);
-
-    
 }
 
 main()

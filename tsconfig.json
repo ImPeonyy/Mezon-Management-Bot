@@ -7,14 +7,16 @@
         "outDir": "dist",
         "strict": true,
         "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
         "baseUrl": "src",
         "paths": {
-            "@bot/*": ["bot/*"],
-            "@services/*": ["services/*"],
-            "@repositories/*": ["repositories/*"],
-            "@database/*": ["database/*"],
-            "@utils/*": ["utils/*"],
-            "@api/*": ["api/*"]
+            "@/*": ["./*"],
+            "@bot/*": ["./bot/*"],
+            "@services/*": ["./services/*"],
+            "@repositories/*": ["./repositories/*"],
+            "@clients/*": ["./clients/*"],
+            "@utils/*": ["./utils/*"],
+            "@api/*": ["./api/*"]
         }
     }
 }
