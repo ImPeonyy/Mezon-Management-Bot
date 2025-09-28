@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { updateEventMessageAPI } from "@/api/event-message/eventMessage.api";
+import { authenticateToken } from "@/middleware/auth.middleware";
 
 const router = Router();
 
@@ -9,6 +10,6 @@ const router = Router();
  * @access Public
  * @param id - Event Message ID
  */
-router.put("/:id", updateEventMessageAPI);
+router.put("/:id", updateEventMessageAPI, authenticateToken);
 
 export default router;

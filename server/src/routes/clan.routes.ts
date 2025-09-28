@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { getClanWithEventMessagesAPI } from "@/api/clan/clan.api";
+import { authenticateToken } from "@/middleware/auth.middleware";
 
 const router = Router();
 
@@ -9,6 +10,6 @@ const router = Router();
  * @access Public
  * @param id - Clan ID
  */
-router.get("/:id", getClanWithEventMessagesAPI);
+router.get("/:id", getClanWithEventMessagesAPI, authenticateToken);
 
 export default router;
