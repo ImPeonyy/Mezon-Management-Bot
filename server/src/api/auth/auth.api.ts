@@ -1,5 +1,5 @@
-import { LoginRequest, LoginResponse, RefreshTokenRequest, RefreshTokenResponse } from "./auth.interface";
-import { authenticateUser } from "@/repositories/auth.repo";
+import { LoginRequest, LoginResponse, RefreshTokenRequest, RefreshTokenResponse, ChangePasswordRequest, ChangePasswordResponse } from "./auth.interface";
+import { authenticateUser, changeUserPassword } from "@/repositories/auth.repo";
 import { generateToken, verifyToken } from "@/utils/jwt.util";
 import { Request, Response } from "express";
 
@@ -88,6 +88,58 @@ export const refreshTokenAPI = async (req: Request<{}, RefreshTokenResponse, Ref
 
     } catch (error) {
         console.error("Refresh token error:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error"
+        });
+    }
+};
+
+export const changePasswordAPI = async (req: Request<{}, ChangePasswordResponse, ChangePasswordRequest>, res: Response<ChangePasswordResponse>) => {
+    try {
+        const { currentPassword, newPassword } = req.body;
+        const userId = req.user?.userId; // Từ middleware authenticateToken
+
+        // Validate input
+        if (!currentPassword || !newPassword) {
+            return res.status(400).json({
+                success: false,
+                message: "Current password and new password are required"
+            });
+        }
+
+        if (!userId) {
+            return res.status(401).json({
+                success: false,
+                message: "User not authenticated"
+            });
+        }
+
+        // Validate new password strength
+        if (newPassword.length < 8) {
+            return res.status(400).json({
+                success: false,
+                message: "New password must be at least 8 characters long"
+            });
+        }
+
+        // Change password
+        const result = await changeUserPassword(userId, currentPassword, newPassword);
+
+        if (result.success) {
+            return res.status(200).json({
+                success: true,
+                message: result.message
+            });
+        } else {
+            return res.status(400).json({
+                success: false,
+                message: result.message
+            });
+        }
+
+    } catch (error) {
+        console.error("Change password error:", error);
         return res.status(500).json({
             success: false,
             message: "Internal server error"

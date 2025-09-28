@@ -1,5 +1,10 @@
-import LoginForm from "../../src/components/LoginForm";
+import LoginForm from "@/components/LoginForm";
+import PublicRoute from "@/components/PublicRoute";
 
 export default function LoginPage() {
-    return <LoginForm />;
+    return (
+        <PublicRoute>
+            <LoginForm />
+        </PublicRoute>
+    );
 }
