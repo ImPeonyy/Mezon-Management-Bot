@@ -1,1 +1,2 @@
-export const TRIGGER_WORD = "!peo";
+export const TRIGGER_WORD = '!peo';
+export const DEFAULT_PASSWORD = process.env.DEFAULT_PASSWORD || '$argon2id$v=19$m=65536,t=3,p=4$sILJi0XgVA5eLw3gs//Y8Q$nCT050C1+UpuCHbHveNtGaAUvVDq6IhnzZc77lDmrPE'; // Peo
