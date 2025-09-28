@@ -1,5 +1,10 @@
-import ChangePasswordForm from "../../src/components/ChangePasswordForm";
+import ChangePasswordForm from "@/components/ChangePasswordForm";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
 export default function ChangePasswordPage() {
-    return <ChangePasswordForm />;
+    return (
+        <ProtectedRoute>
+            <ChangePasswordForm />
+        </ProtectedRoute>
+    );
 }

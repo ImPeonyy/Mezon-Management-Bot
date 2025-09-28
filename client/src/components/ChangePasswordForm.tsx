@@ -1,18 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function ChangePasswordForm() {
+    const router = useRouter();
     const [formData, setFormData] = useState({
         currentPassword: "",
         newPassword: "",
         confirmPassword: "",
-    });
-
-    const [showPasswords, setShowPasswords] = useState({
-        current: false,
-        new: false,
-        confirm: false,
     });
 
     const [passwordStrength, setPasswordStrength] = useState(0);
@@ -36,7 +32,6 @@ export default function ChangePasswordForm() {
         if (/[a-z]/.test(password)) strength += 1;
         if (/[A-Z]/.test(password)) strength += 1;
         if (/[0-9]/.test(password)) strength += 1;
-        if (/[^A-Za-z0-9]/.test(password)) strength += 1;
         setPasswordStrength(strength);
     };
 
@@ -50,16 +45,14 @@ export default function ChangePasswordForm() {
             case 3:
                 return { text: "Trung bình", color: "text-yellow-600" };
             case 4:
-                return { text: "Mạnh", color: "text-blue-600" };
-            case 5:
-                return { text: "Rất mạnh", color: "text-green-600" };
+                return { text: "Mạnh", color: "text-green-600" };
             default:
                 return { text: "", color: "" };
         }
     };
 
     const getPasswordStrengthWidth = () => {
-        return `${(passwordStrength / 5) * 100}%`;
+        return `${(passwordStrength / 4) * 100}%`;
     };
 
     const getPasswordStrengthColor = () => {
@@ -72,25 +65,78 @@ export default function ChangePasswordForm() {
             case 3:
                 return "bg-yellow-500";
             case 4:
-                return "bg-blue-500";
-            case 5:
                 return "bg-green-500";
             default:
                 return "bg-gray-300";
         }
     };
 
-    const togglePasswordVisibility = (field: "current" | "new" | "confirm") => {
-        setShowPasswords((prev) => ({
-            ...prev,
-            [field]: !prev[field],
-        }));
-    };
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [message, setMessage] = useState({ type: "", text: "" });
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // Logic xử lý đổi mật khẩu sẽ được thêm vào đây
-        console.log("Đổi mật khẩu với:", formData);
+        setMessage({ type: "", text: "" });
+        setIsSubmitting(true);
+
+        try {
+            // Import API service
+            const { authAPI } = await import("@/services/api");
+
+            const response = await authAPI.changePassword({
+                currentPassword: formData.currentPassword,
+                newPassword: formData.newPassword,
+            });
+
+            if (response.success) {
+                setMessage({
+                    type: "success",
+                    text: (response.message || "Đổi mật khẩu thành công!") + " Đang chuyển về dashboard...",
+                });
+                // Reset form
+                setFormData({
+                    currentPassword: "",
+                    newPassword: "",
+                    confirmPassword: "",
+                });
+                setPasswordStrength(0);
+                
+                // Redirect to dashboard after 2 seconds
+                setTimeout(() => {
+                    router.push('/dashboard');
+                }, 2000);
+            } else {
+                setMessage({
+                    type: "error",
+                    text: response.message || "Đổi mật khẩu thất bại",
+                });
+            }
+        } catch (error: unknown) {
+            // console.error("Change password error:", error);
+
+            // Xử lý lỗi từ API response
+            if (error && typeof error === 'object' && 'response' in error) {
+                const apiError = error as { response?: { data?: { message?: string } } };
+                if (apiError.response?.data?.message) {
+                    setMessage({
+                        type: "error",
+                        text: apiError.response.data.message,
+                    });
+                } else {
+                    setMessage({
+                        type: "error",
+                        text: "Có lỗi xảy ra. Vui lòng thử lại.",
+                    });
+                }
+            } else {
+                setMessage({
+                    type: "error",
+                    text: "Có lỗi xảy ra. Vui lòng thử lại.",
+                });
+            }
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     const passwordsMatch = formData.newPassword === formData.confirmPassword;
@@ -114,7 +160,7 @@ export default function ChangePasswordForm() {
                             />
                         </svg>
                     </div>
-                    <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+                    <h2 className="mt-6 text-center text-3xl font-bold text-gray-900">
                         Đổi mật khẩu
                     </h2>
                     <p className="mt-2 text-center text-sm text-gray-600">
@@ -123,6 +169,45 @@ export default function ChangePasswordForm() {
                 </div>
 
                 <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+                    {message.text && (
+                        <div
+                            className={`px-4 py-3 rounded relative ${
+                                message.type === "success"
+                                    ? "bg-green-50 border border-green-200 text-green-700"
+                                    : "bg-red-50 border border-red-200 text-red-700"
+                            }`}
+                        >
+                            <div className="flex items-center">
+                                {message.type === "success" ? (
+                                    <svg
+                                        className="h-5 w-5 mr-2"
+                                        fill="currentColor"
+                                        viewBox="0 0 20 20"
+                                    >
+                                        <path
+                                            fillRule="evenodd"
+                                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                            clipRule="evenodd"
+                                        />
+                                    </svg>
+                                ) : (
+                                    <svg
+                                        className="h-5 w-5 mr-2"
+                                        fill="currentColor"
+                                        viewBox="0 0 20 20"
+                                    >
+                                        <path
+                                            fillRule="evenodd"
+                                            d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                            clipRule="evenodd"
+                                        />
+                                    </svg>
+                                )}
+                                {message.text}
+                            </div>
+                        </div>
+                    )}
+
                     <div className="space-y-4">
                         {/* Mật khẩu hiện tại */}
                         <div className="relative">
@@ -135,59 +220,14 @@ export default function ChangePasswordForm() {
                             <input
                                 id="currentPassword"
                                 name="currentPassword"
-                                type={
-                                    showPasswords.current ? "text" : "password"
-                                }
+                                type="password"
                                 autoComplete="current-password"
                                 required
-                                className="appearance-none relative block w-full px-3 py-2 pr-10 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                                 placeholder="Nhập mật khẩu hiện tại"
                                 value={formData.currentPassword}
                                 onChange={handleChange}
                             />
-                            <button
-                                type="button"
-                                className="absolute inset-y-0 right-0 pr-3 flex items-center mt-6"
-                                onClick={() =>
-                                    togglePasswordVisibility("current")
-                                }
-                            >
-                                {showPasswords.current ? (
-                                    <svg
-                                        className="h-5 w-5 text-gray-400"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke="currentColor"
-                                    >
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth={2}
-                                            d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"
-                                        />
-                                    </svg>
-                                ) : (
-                                    <svg
-                                        className="h-5 w-5 text-gray-400"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke="currentColor"
-                                    >
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth={2}
-                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                                        />
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth={2}
-                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                                        />
-                                    </svg>
-                                )}
-                            </button>
                         </div>
 
                         {/* Mật khẩu mới */}
@@ -201,55 +241,14 @@ export default function ChangePasswordForm() {
                             <input
                                 id="newPassword"
                                 name="newPassword"
-                                type={showPasswords.new ? "text" : "password"}
+                                type="password"
                                 autoComplete="new-password"
                                 required
-                                className="appearance-none relative block w-full px-3 py-2 pr-10 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                                 placeholder="Nhập mật khẩu mới"
                                 value={formData.newPassword}
                                 onChange={handleChange}
                             />
-                            <button
-                                type="button"
-                                className="absolute inset-y-0 right-0 pr-3 flex items-center mt-6"
-                                onClick={() => togglePasswordVisibility("new")}
-                            >
-                                {showPasswords.new ? (
-                                    <svg
-                                        className="h-5 w-5 text-gray-400"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke="currentColor"
-                                    >
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth={2}
-                                            d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"
-                                        />
-                                    </svg>
-                                ) : (
-                                    <svg
-                                        className="h-5 w-5 text-gray-400"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke="currentColor"
-                                    >
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth={2}
-                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                                        />
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth={2}
-                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                                        />
-                                    </svg>
-                                )}
-                            </button>
 
                             {/* Thanh đo độ mạnh mật khẩu */}
                             {formData.newPassword && (
@@ -289,12 +288,10 @@ export default function ChangePasswordForm() {
                             <input
                                 id="confirmPassword"
                                 name="confirmPassword"
-                                type={
-                                    showPasswords.confirm ? "text" : "password"
-                                }
+                                type="password"
                                 autoComplete="new-password"
                                 required
-                                className={`appearance-none relative block w-full px-3 py-2 pr-10 border placeholder-gray-500 text-gray-900 rounded-md focus:outline-none sm:text-sm ${
+                                className={`appearance-none relative block w-full px-3 py-2 border placeholder-gray-500 text-gray-900 rounded-md focus:outline-none sm:text-sm ${
                                     formData.confirmPassword && !passwordsMatch
                                         ? "border-red-300 focus:ring-red-500 focus:border-red-500"
                                         : formData.confirmPassword &&
@@ -306,49 +303,6 @@ export default function ChangePasswordForm() {
                                 value={formData.confirmPassword}
                                 onChange={handleChange}
                             />
-                            <button
-                                type="button"
-                                className="absolute inset-y-0 right-0 pr-3 flex items-center mt-6"
-                                onClick={() =>
-                                    togglePasswordVisibility("confirm")
-                                }
-                            >
-                                {showPasswords.confirm ? (
-                                    <svg
-                                        className="h-5 w-5 text-gray-400"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke="currentColor"
-                                    >
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth={2}
-                                            d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"
-                                        />
-                                    </svg>
-                                ) : (
-                                    <svg
-                                        className="h-5 w-5 text-gray-400"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke="currentColor"
-                                    >
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth={2}
-                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                                        />
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth={2}
-                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                                        />
-                                    </svg>
-                                )}
-                            </button>
 
                             {/* Thông báo xác nhận mật khẩu */}
                             {formData.confirmPassword && (
@@ -451,38 +405,55 @@ export default function ChangePasswordForm() {
                                 </span>
                                 Chứa số
                             </li>
-                            <li className="flex items-center">
-                                <span
-                                    className={`mr-2 ${
-                                        /[^A-Za-z0-9]/.test(
-                                            formData.newPassword
-                                        )
-                                            ? "text-green-600"
-                                            : "text-gray-400"
-                                    }`}
-                                >
-                                    {/[^A-Za-z0-9]/.test(formData.newPassword)
-                                        ? "✓"
-                                        : "○"}
-                                </span>
-                                Chứa ký tự đặc biệt
-                            </li>
                         </ul>
                     </div>
 
                     <div className="flex space-x-4">
                         <button
                             type="button"
-                            className="flex-1 py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out"
+                            className="flex-1 py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out cursor-pointer"
+                            onClick={() => {
+                                router.push('/dashboard');
+                            }}
                         >
                             Hủy
                         </button>
                         <button
                             type="submit"
-                            disabled={!passwordsMatch || passwordStrength < 3}
-                            className="flex-1 py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:bg-gray-400 disabled:cursor-not-allowed transition duration-150 ease-in-out"
+                            disabled={
+                                !passwordsMatch ||
+                                passwordStrength < 3 ||
+                                isSubmitting
+                            }
+                            className="flex-1 py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:bg-gray-400 disabled:cursor-not-allowed transition duration-150 ease-in-out flex items-center justify-center cursor-pointer"
                         >
-                            Đổi mật khẩu
+                            {isSubmitting ? (
+                                <>
+                                    <svg
+                                        className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <circle
+                                            className="opacity-25"
+                                            cx="12"
+                                            cy="12"
+                                            r="10"
+                                            stroke="currentColor"
+                                            strokeWidth="4"
+                                        ></circle>
+                                        <path
+                                            className="opacity-75"
+                                            fill="currentColor"
+                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                        ></path>
+                                    </svg>
+                                    Đang xử lý...
+                                </>
+                            ) : (
+                                "Đổi mật khẩu"
+                            )}
                         </button>
                     </div>
                 </form>

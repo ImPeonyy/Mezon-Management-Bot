@@ -40,6 +40,19 @@ export const getClan = async (clanId: string) => {
     }
 };
 
+export const getAllClans = async () => {
+    try {
+        return await prisma.clan.findMany({
+            orderBy: {
+                created_at: 'desc'
+            }
+        });
+    } catch (error) {
+        console.error("Error getting all clans", error);
+        return [];
+    }
+};
+
 export const getClanWithEventMessages = async (clanId: string) => {
     try {
         return await prisma.clan.findUniqueOrThrow({
@@ -50,5 +63,6 @@ export const getClanWithEventMessages = async (clanId: string) => {
         });
     } catch (error) {
         console.error("Error getting clan with event messages", error);
+        return null;
     }
 };

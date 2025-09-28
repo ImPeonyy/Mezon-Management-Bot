@@ -7,9 +7,9 @@ const router = Router();
 /**
  * @route PUT /api/event-msg/:id
  * @desc Update event message by ID
- * @access Public
+ * @access Private
  * @param id - Event Message ID
  */
-router.put("/:id", updateEventMessageAPI, authenticateToken);
+router.put("/:id", authenticateToken, updateEventMessageAPI);
 
 export default router;

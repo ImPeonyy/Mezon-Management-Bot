@@ -1,4 +1,5 @@
-import { loginUserAPI, refreshTokenAPI } from "@/api/auth/auth.api";
+import { loginUserAPI, refreshTokenAPI, changePasswordAPI } from "@/api/auth/auth.api";
+import { authenticateToken } from "@/middleware/auth.middleware";
 import { Router } from "express";
 
 const router = Router();
@@ -18,5 +19,13 @@ router.post("/login", loginUserAPI);
  * @body { token: string }
  */
 router.post("/refresh", refreshTokenAPI);
+
+/**
+ * @route PUT /api/auth/change-password
+ * @desc Change user password
+ * @access Private
+ * @body { currentPassword: string, newPassword: string }
+ */
+router.put("/change-password", authenticateToken, changePasswordAPI);
 
 export default router;

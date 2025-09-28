@@ -1,5 +1,5 @@
 import { getUser } from "./user.repo";
-import { setupClan, getClanWithEventMessages, getClan } from "./clan.repo";
+import { setupClan, getClanWithEventMessages, getClan, getAllClans } from "./clan.repo";
 import { createEventMessage, updateEventMessage } from "./eventMessage.repo";
 
 export {
@@ -8,5 +8,6 @@ export {
     createEventMessage,
     getClanWithEventMessages,
     getClan,
+    getAllClans,
     updateEventMessage,
 };

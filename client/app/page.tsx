@@ -1,13 +1,13 @@
-import Image from "next/image";
 import Link from "next/link";
+import PublicRoute from "@/components/PublicRoute";
 
-export default function Home() {
+function HomeContent() {
     return (
         <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-            <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
+            <main className="flex flex-col gap-[32px] row-start-2 items-center">
                 <div className="text-center sm:text-left">
                     <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-                        Mezon Management Bot
+                        Mezon Management Clan
                     </h1>
                 </div>
 
@@ -29,29 +29,18 @@ export default function Home() {
                                 d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                             />
                         </svg>
-                        Form Đăng Nhập
-                    </Link>
-                    <Link
-                        className="rounded-full border border-solid border-green-600 transition-colors flex items-center justify-center bg-green-600 text-white hover:bg-green-700 font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto"
-                        href="/change-password"
-                    >
-                        <svg
-                            className="w-5 h-5"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                            />
-                        </svg>
-                        Form Đổi Mật Khẩu
+                        Đăng Nhập
                     </Link>
                 </div>
             </main>
         </div>
+    );
+}
+
+export default function Home() {
+    return (
+        <PublicRoute>
+            <HomeContent />
+        </PublicRoute>
     );
 }

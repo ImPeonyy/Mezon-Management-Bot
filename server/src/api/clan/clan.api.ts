@@ -1,6 +1,27 @@
-import { getClanWithEventMessages } from "@/repositories";
+import { getClanWithEventMessages, getAllClans } from "@/repositories";
 import { Request, Response } from "express";
-import { ClanWithEventMessagesResponse } from "./clan.interface";
+import { ClanWithEventMessagesResponse, GetAllClansResponse } from "./clan.interface";
+
+export const getAllClansAPI = async (
+    req: Request,
+    res: Response<GetAllClansResponse>
+) => {
+    try {
+        const clans = await getAllClans();
+
+        return res.status(200).json({
+            success: true,
+            message: "Get all clans successful",
+            data: clans,
+        });
+    } catch (error) {
+        console.error("Get all clans error:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error",
+        });
+    }
+};
 
 export const getClanWithEventMessagesAPI = async (
     req: Request<{ id: string }>,

@@ -3,6 +3,16 @@ export interface LoginRequest {
     password: string;
 }
 
+export interface ChangePasswordRequest {
+    currentPassword: string;
+    newPassword: string;
+}
+
+export interface ChangePasswordResponse {
+    success: boolean;
+    message: string;
+}
+
 export interface RefreshTokenRequest {
     token: string;
 }
@@ -23,6 +33,7 @@ export interface LoginResponse {
     data?: {
         user: {
             id: string;
+            username: string;
             created_at: Date;
             updated_at: Date;
         };
