@@ -1,7 +1,7 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 
 // Base URL cho API
-const BASE_URL = process.env.API_URL || 'http://localhost:3000/api';
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL  || 'http://localhost:3000/api';
 
 // Storage keys
 const STORAGE_KEYS = {
