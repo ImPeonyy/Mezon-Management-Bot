@@ -11,9 +11,8 @@ Mezon Management Bot là một bot Mezon giúp quản lý clan tự động vớ
 
 ## Bước 1: Mời bot vào server Mezon
 
-### 1.1 Lấy link mời bot
-- Liên hệ admin để lấy link mời bot vào server Mezon của bạn
-- Link mời sẽ có dạng: `https://mezon.ai/developers/bot/install/1971776014707068928`
+### 1.1 Mời bot vào clan của bạn.
+- Mời bot ở dây: [Mezon Management Clan](https://mezon.ai/developers/bot/install/1971776014707068928)
 
 ### 1.2 Mời bot vào server
 1. Click vào link mời bot
@@ -52,7 +51,7 @@ Sau khi bot đã được thêm vào server, bạn cần chạy lệnh setup đ�
 ## Bước 3: Truy cập trang quản lý và đăng nhập
 
 ### 3.1 Truy cập trang web
-- Mở trình duyệt và truy cập: `https://mezon-management-bot.vercel.app/`
+- Mở trình duyệt và truy cập: [Mezon Management](https://mezon-management-bot.vercel.app/)
 - Trang chủ sẽ hiển thị nút "Đăng Nhập"
 
 ### 3.2 Thông tin đăng nhập
