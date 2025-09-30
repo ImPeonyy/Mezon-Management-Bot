@@ -46,7 +46,9 @@ model EventMessage {
   id        Int      @id @default(autoincrement())
   clan_id   String
   event     EEvent 
-  template  String  
+  template  String 
+  has_avatar Boolean  @default(true)
+  is_AI_gen Boolean  @default(true)
 
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt

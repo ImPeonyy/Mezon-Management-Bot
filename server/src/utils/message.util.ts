@@ -9,19 +9,19 @@ export const textMessage = (message: string) => {
     return messagePayload;
 };
 
-export const getWelcomeMessage = (message: string, avatarUrl: string) => {
+export const getWelcomeMessage = (message: string, avatarUrl?: string) => {
     const embedConfig: IInteractiveMessageProps[] = [
         {
             color: getRandomPastelHexColor(),
-            title: message,
             image: {
-                url: avatarUrl
+                url: avatarUrl ?? ""
             }
         }
     ];
     const messagePayload: ChannelMessageContent = {
-        embed: embedConfig
+        t: message,
+        embed: avatarUrl ? embedConfig : undefined
     };
-
+    
     return messagePayload;
 };

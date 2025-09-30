@@ -1,7 +1,11 @@
 import { SETUP_EVENT_MESSAGE_TEMPLATES } from "@/bot/commands/setup/setup.constants";
 import { getClanWithEventMessages } from "@/repositories";
-import { getWelcomeMessage, textMessage } from "@/utils";
-import { replacePlaceholders } from "@/utils/misc.util";
+import { getAIWelcomeMessage } from "@/services/openAI.service";
+import {
+    getWelcomeMessage,
+    getMentionPosition,
+    replacePlaceholders,
+} from "@/utils";
 import { EEvent } from "@prisma/client";
 import { MezonClient } from "mezon-sdk";
 
@@ -14,17 +18,35 @@ export const onWelcomeEvent = (client: MezonClient) => {
                 clan.welcome_channel_id
             );
 
+            const welcomeEvent = clan.event_messages.find(
+                (message) => message.event === EEvent.CLAN_JOIN
+            );
+
+            let rawMessage = welcomeEvent?.template;
+            if (welcomeEvent?.is_AI_gen) {
+                rawMessage = await getAIWelcomeMessage();
+            }
+
             const welcomeMessage = replacePlaceholders(
-                clan.event_messages.find(
-                    (message) => message.event === EEvent.CLAN_JOIN
-                )?.template ?? SETUP_EVENT_MESSAGE_TEMPLATES.CLAN_JOIN,
+                rawMessage ?? SETUP_EVENT_MESSAGE_TEMPLATES.CLAN_JOIN,
                 {
-                    user: user.display_name,
+                    user: `@${user.display_name}`,
                     clan: clan.clan_name,
                 }
             );
 
-            await welcomeChannel.send(getWelcomeMessage(welcomeMessage, user.avatar));
+            const mentionPosition = getMentionPosition(welcomeMessage);
+
+            await welcomeChannel.send(
+                getWelcomeMessage(welcomeMessage, welcomeEvent?.has_avatar ? user.avatar : null),
+                [
+                    {
+                        user_id: user.user_id,
+                        s: mentionPosition?.start,
+                        e: mentionPosition?.end,
+                    },
+                ]
+            );
         } else {
             console.error("Clan not found or event messages not found");
             return;
