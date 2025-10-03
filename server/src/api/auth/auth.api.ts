@@ -1,6 +1,6 @@
 import { LoginRequest, LoginResponse, RefreshTokenRequest, RefreshTokenResponse, ChangePasswordRequest, ChangePasswordResponse } from "./auth.interface";
 import { authenticateUser, changeUserPassword } from "@/repositories/auth.repo";
-import { generateToken, verifyToken } from "@/utils/jwt.util";
+import { generateToken, verifyToken, verifyTokenForRefresh } from "@/utils/jwt.util";
 import { Request, Response } from "express";
 
 export const loginUserAPI = async (req: Request<{}, LoginResponse, LoginRequest>, res: Response<LoginResponse>) => {
@@ -62,13 +62,13 @@ export const refreshTokenAPI = async (req: Request<{}, RefreshTokenResponse, Ref
             });
         }
 
-        // Verify token
-        const decoded = verifyToken(token);
+        // Verify token for refresh (allows expired tokens)
+        const decoded = verifyTokenForRefresh(token);
         
         if (!decoded) {
             return res.status(401).json({
                 success: false,
-                message: "Invalid or expired token"
+                message: "Invalid token"
             });
         }
 

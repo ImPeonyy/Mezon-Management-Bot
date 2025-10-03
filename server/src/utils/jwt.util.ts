@@ -41,6 +41,26 @@ export const verifyToken = (token: string): JWTPayload | null => {
 };
 
 /**
+ * Xác thực JWT token cho refresh token (cho phép token hết hạn)
+ * @param token - JWT token string
+ * @returns Decoded payload hoặc null nếu token không hợp lệ
+ */
+export const verifyTokenForRefresh = (token: string): JWTPayload | null => {
+    try {
+        // Decode token mà không xác thực thời gian hết hạn
+        const decoded = jwt.decode(token) as JWTPayload;
+        
+        // Kiểm tra signature bằng cách verify với ignoreExpiration
+        jwt.verify(token, JWT_SECRET, { ignoreExpiration: true });
+        
+        return decoded;
+    } catch (error) {
+        console.error('JWT refresh verification failed:', error);
+        return null;
+    }
+};
+
+/**
  * Decode JWT token mà không xác thực
  * @param token - JWT token string
  * @returns Decoded payload hoặc null
