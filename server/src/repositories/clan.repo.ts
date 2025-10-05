@@ -55,7 +55,7 @@ export const getAllClans = async () => {
 
 export const getClanWithEventMessages = async (clanId: string) => {
     try {
-        return await prisma.clan.findUniqueOrThrow({
+        return await prisma.clan.findUnique({
             where: { id: clanId },
             include: {
                 event_messages: true,
