@@ -19,7 +19,7 @@ export function replacePlaceholders(
 ): string {
     return template.replace(/\{(\w+)\}/g, (_, key: string) => {
         const value = data[key];
-        return value != null ? `"${String(value)}"` : '""';
+        return value != null ? `${String(value)}` : '';
     });
 }
 
@@ -39,7 +39,7 @@ const hslToHex = (h: number, s: number, l: number): string => {
     return `#${[f(0), f(8), f(4)]
         .map((x) => x.toString(16).padStart(2, "0"))
         .join("")}`;
-}
+};
 
 export const getRandomPastelHexColor = () => {
     const hue = Math.floor(Math.random() * 360);
@@ -47,4 +47,15 @@ export const getRandomPastelHexColor = () => {
     const lightness = 80;
 
     return hslToHex(hue, saturation, lightness);
+};
+
+export const getMentionPosition = (text: string, username: string) => {
+    const regex = /@\w+/;
+    const match = text.match(regex);
+
+    if (!match) return null;
+
+    const start = match.index;
+    const end = start ? start + username.length + 1 : 0;
+    return { start, end };
 };
