@@ -49,13 +49,13 @@ export const getRandomPastelHexColor = () => {
     return hslToHex(hue, saturation, lightness);
 };
 
-export const getMentionPosition = (text: string) => {
+export const getMentionPosition = (text: string, username: string) => {
     const regex = /@\w+/;
     const match = text.match(regex);
 
     if (!match) return null;
 
     const start = match.index;
-    const end = start ? start + match[0].length : 0;
+    const end = start ? start + username.length + 1 : 0;
     return { start, end };
 };

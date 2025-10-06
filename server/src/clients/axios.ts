@@ -13,7 +13,6 @@ export const createAxiosClient = (baseURL: string, apiKey: string) => {
 
   client.interceptors.request.use(
     (config: any) => {
-      console.log("👉 [Request]", config.method?.toUpperCase(), config.baseURL + config.url);
       return config;
     },
     (error) => Promise.reject(error)

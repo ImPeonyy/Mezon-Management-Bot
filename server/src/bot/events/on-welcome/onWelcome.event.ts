@@ -35,7 +35,7 @@ export const onWelcomeEvent = (client: MezonClient) => {
                 }
             );
 
-            const mentionPosition = getMentionPosition(welcomeMessage);
+            const mentionPosition = getMentionPosition(welcomeMessage, user.display_name);
 
             await welcomeChannel.send(
                 getWelcomeMessage(welcomeMessage, welcomeEvent?.has_avatar ? user.avatar : null),
