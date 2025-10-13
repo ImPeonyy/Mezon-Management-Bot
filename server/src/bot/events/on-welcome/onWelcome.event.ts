@@ -13,7 +13,7 @@ export const onWelcomeEvent = (client: MezonClient) => {
     client.onAddClanUser(async (event: any) => {
         const { clan_id, user } = event;
         const clan = await getClanWithEventMessages(clan_id);
-        if (clan && clan.event_messages) {
+        if (clan && clan.event_messages && user.user_id && user.display_name) {
             const welcomeChannel = await client.channels.fetch(
                 clan.welcome_channel_id
             );
