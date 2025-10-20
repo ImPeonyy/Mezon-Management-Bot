@@ -17,7 +17,7 @@
     "cors": "^2.8.5",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
-    "mezon-sdk": "^2.8.20"
+    "mezon-sdk": "^2.8.22"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
